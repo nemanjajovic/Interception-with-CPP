@@ -1,2 +1,8 @@
 .vscode
 mingw-std-threads/
+interception.h
+interception.lib
+macro.exe
+macro.exp
+macro.lib
+macro.obj
