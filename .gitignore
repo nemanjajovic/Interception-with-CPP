@@ -1,7 +1,7 @@
 .vscode
 mingw-std-threads/
-interception.h
-interception.lib
+./interception.h
+./interception.lib
 macro.exe
 macro.exp
 macro.lib
