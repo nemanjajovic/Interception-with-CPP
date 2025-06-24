@@ -1,16 +1,35 @@
 import subprocess
 
+
+# Example function
+def example_function():
+    print("You pressed W")
+
+
+# Add python logic here
+key_actions = {
+    "q": lambda: print("You pressed Q"),
+    "w": example_function,
+    # Add more keys and actions here
+}
+
 try:
     process = subprocess.Popen(
         ["macro.exe"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
     )
+    print("Macro.exe started!")
 
     for line in process.stdout:
-        key = line.strip()
-        print(key)
-        # Add logic here...
+        key = line.strip().lower()
+        action = key_actions.get(key)
+
+        if action:
+            action()
+        else:
+            print(f"No action defined for: {key} key")
 
 except KeyboardInterrupt:
-    print("\nQuitting the program.")
+    print("Quitting Macro.exe...")
     process.terminate()  # Gracefully shut down the C++ child process
     process.wait()
+    print("Macro.exe sucessfully stopped!")
