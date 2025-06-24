@@ -1,2 +1,1 @@
-This project is licensed under the GNU General Public License v3.0
-See https://www.gnu.org/licenses/gpl-3.0 for full terms.
+This project is licensed under the GNU Lesser General Public License v3.0.
