@@ -4,9 +4,8 @@
 #include <vector>
 #include <algorithm>
 #define INTERCEPTION_STATIC
-#include "interception.h"
+#include "library/interception.h"
 
-#pragma comment(lib, "interception.lib")
 #pragma comment(lib, "User32.lib")
 
 std::string GetKeyName(unsigned short code) {
