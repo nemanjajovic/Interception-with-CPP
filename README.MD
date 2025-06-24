@@ -12,7 +12,7 @@ Whether you want to launch applications, control media, trigger hotkeys, or stre
 
 Before getting started, make sure you have:
 
-- **Visual Studio 2022** with the *Desktop development with C++* workload  
+- **Visual Studio 2022** with the *Desktop development with C++* workload (Needed for x86/x64 Native build tools)
 - **Python** installed and added to your system PATH  
 - A **secondary keyboard** (preferably USB) to act as your macro trigger device  
 - Basic knowledge of **C++ compilation** and **Python scripting**  
