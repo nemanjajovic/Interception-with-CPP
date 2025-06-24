@@ -6,18 +6,16 @@ A complete walkthrough for installing and compiling Interception and `macro.cpp`
 
 ## 🛠️ 1. Installing Interception
 
-1. **Download the latest release** from 👉 [Interception Releases](https://github.com/oblitum/Interception/releases)
+1. **Run Command Prompt as Administrator**
 
-2. **Run Command Prompt as Administrator**
-
-4. **Install Interception** with the command:  
+2. **Install Interception** with the command:  
 ```
 ./install-interception.exe /install
 ```
 
-5. **Reboot your PC**
+3. **Reboot your PC**
 
-6. **Verify installation**:
+4. **Verify installation**:
 - Run:
   ```
   sc query keyboard
@@ -31,13 +29,11 @@ A complete walkthrough for installing and compiling Interception and `macro.cpp`
 
 ## 🧱 2. Compiling Interception Libraries
 
-1. **Clone the source** from 👉 [Interception Source Code](https://github.com/oblitum/Interception/tree/master)
+1. Open **x86 Native Developer Command Prompt** (from Visual Studio 2022)
 
-2. Open **x86 Native Developer Command Prompt** (from Visual Studio 2022)
+2. Navigate to: ./library
 
-3. Navigate to: ./library
-
-4. Run the following commands:
+3. Run the following commands:
 ```
 cl /c interception.c
 ```
