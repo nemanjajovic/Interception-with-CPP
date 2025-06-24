@@ -1,10 +1,10 @@
-# 🎯 Interception Setup & Compilation Guide
+# Setup & Compilation Guide
 
-A complete walkthrough for installing and compiling Interception and `macro.cpp`.
+A complete walkthrough for installing interception driver and compiling Interception libraries and `macro.cpp`.
 
 ---
 
-## 🛠️ 1. Installing Interception
+## 1. Installing Interception Driver
 
 1. **Run Command Prompt as Administrator**
 
@@ -27,7 +27,7 @@ A complete walkthrough for installing and compiling Interception and `macro.cpp`
 
 ---
 
-## 🧱 2. Compiling Interception Libraries
+## 2. Compiling Interception Libraries
 
 1. Open **x86 Native Developer Command Prompt** (from Visual Studio 2022)
 
@@ -43,7 +43,7 @@ lib interception.obj /OUT:interception.lib
 
 ---
 
-## ⚙️ 3. Compiling `macro.cpp`
+## 3. Compiling `macro.cpp`
 
 1. Open **x86 Native Developer Command Prompt** as Administrator
 
@@ -54,7 +54,7 @@ build.bat
 
 ---
 
-## 🧠 4. Running the Program
+## 4. Running the Program
 
 Run everything through your Python interface for clean control and logging:
 
@@ -68,8 +68,10 @@ This will:
 - Read key events from your USB keyboard
 - Let you trigger actions directly from `main.py`
 
+---
 
-## ✅ You're All Set!
+## 5. You're All Set!
 
+Add your custom logic to `main.py` — each keypress from your USB keyboard will trigger it in real time.
 
-
+With that, you’ve transformed your keyboard into a dedicated macro device ready to automate anything you want.
