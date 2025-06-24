@@ -1,4 +1,4 @@
-## About This Project
+# About
 
 This project turns your secondary keyboard into a powerful macro engine.
 
