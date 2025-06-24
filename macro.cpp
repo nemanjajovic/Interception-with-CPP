@@ -1,13 +1,14 @@
 #include <iostream>
 #include <windows.h>
 #include <string>
+#include <vector>
+#include <algorithm>
 #define INTERCEPTION_STATIC
 #include "interception.h"
 
-// Link against the Interception static library
 #pragma comment(lib, "interception.lib")
+#pragma comment(lib, "User32.lib")
 
-// Converts a scan code into a human-readable key name
 std::string GetKeyName(unsigned short code) {
     UINT scan = code & 0xFF;
     if (code & 0xE000) scan |= 0xE000;
@@ -23,9 +24,6 @@ std::string GetKeyName(unsigned short code) {
 }
 
 int main() {
-    // Hardware ID string identifying the second keyboard (partial match is okay)
-    const wchar_t* targetHardwareId = L"HID\\VID_C0F4&PID_07F5";
-
     std::cout << "Creating context..." << std::endl;
     InterceptionContext context = interception_create_context();
     if (!context) {
@@ -33,52 +31,51 @@ int main() {
         return 1;
     }
 
-    InterceptionDevice targetDevice = 0;
-    wchar_t hardwareId[500];
+    // Detect all keyboard devices and collect hardware IDs
+    std::vector<std::pair<InterceptionDevice, std::wstring>> keyboards;
 
-    // Search all devices to find the one matching the second keyboard
+    wchar_t buffer[500];
     for (InterceptionDevice device = 1; device <= INTERCEPTION_MAX_DEVICE; ++device) {
         if (interception_is_keyboard(device)) {
-            interception_get_hardware_id(context, device, hardwareId, sizeof(hardwareId));
-            if (wcsstr(hardwareId, targetHardwareId)) {
-                targetDevice = device;
-                std::cout << "Found target keyboard on device " << device << std::endl;
-                break;
-            }
+            interception_get_hardware_id(context, device, buffer, sizeof(buffer));
+            keyboards.emplace_back(device, buffer);
         }
     }
 
-    // Exit if the second keyboard wasn't found
-    if (!targetDevice) {
-        std::cerr << "Target keyboard not found." << std::endl;
+    if (keyboards.empty()) {
+        std::cerr << "No keyboard devices found." << std::endl;
         interception_destroy_context(context);
         return 1;
     }
 
-    // Enable key press/release events for all keyboards
+    // Sort USB devices (starting with "HID\\VID_") to the top
+    std::sort(keyboards.begin(), keyboards.end(),
+        [](const auto& a, const auto& b) {
+            bool a_is_usb = wcsstr(a.second.c_str(), L"HID\\VID_") != nullptr;
+            bool b_is_usb = wcsstr(b.second.c_str(), L"HID\\VID_") != nullptr;
+            return a_is_usb > b_is_usb;
+        });
+
+    // Select the first USB keyboard automatically
+    InterceptionDevice targetDevice = keyboards[0].first;
+    std::wcout << L"Selected USB device: " << keyboards[0].second << L" (device " << targetDevice << L")\n";
+
     interception_set_filter(context, interception_is_keyboard, INTERCEPTION_FILTER_KEY_DOWN | INTERCEPTION_FILTER_KEY_UP);
-    std::cout << "Listening for key events from second keyboard...\n" << std::endl;
 
     InterceptionStroke stroke;
-
-    // Main loop: wait for key events and process them
     while (true) {
         InterceptionDevice device = interception_wait(context);
-
-        // If a stroke was successfully received
         if (interception_receive(context, device, &stroke, 1) > 0) {
-            InterceptionKeyStroke* key = (InterceptionKeyStroke*)&stroke;
-            
-            // If it's from the second keyboard, print it and block it
+            InterceptionKeyStroke* key = reinterpret_cast<InterceptionKeyStroke*>(&stroke);
+
             if (device == targetDevice) {
-                std::cout << "[SECOND KEYBOARD] Code: 0x" << std::hex << key->code
+                std::cout << "[USB KEYBOARD] Code: 0x" << std::hex << key->code
                           << ", State: " << std::dec << key->state
                           << ", Key: " << GetKeyName(key->code) << std::endl;
-                continue;  // Block input from reaching Windows
+                continue;  // Block from OS
             }
 
-            // Otherwise, pass input from other keyboards through
-            interception_send(context, device, &stroke, 1);
+            interception_send(context, device, &stroke, 1); // Let others through
         }
     }
 
