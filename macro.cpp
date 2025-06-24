@@ -68,11 +68,9 @@ int main() {
         if (interception_receive(context, device, &stroke, 1) > 0) {
             InterceptionKeyStroke* key = reinterpret_cast<InterceptionKeyStroke*>(&stroke);
 
-            if (device == targetDevice) {
-                std::cout << "[USB KEYBOARD] Code: 0x" << std::hex << key->code
-                          << ", State: " << std::dec << key->state
-                          << ", Key: " << GetKeyName(key->code) << std::endl;
-                continue;  // Block from OS
+            if (device == targetDevice && key->state == 0) { // Fire only on key down
+            std::cout << GetKeyName(key->code) << std::endl;
+            continue;  // Block from OS
             }
 
             interception_send(context, device, &stroke, 1); // Let others through
