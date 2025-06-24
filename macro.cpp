@@ -23,10 +23,10 @@ std::string GetKeyName(unsigned short code) {
 }
 
 int main() {
-    std::cout << "Creating context..." << std::endl;
+    // std::cout << "Creating context..." << std::endl;
     InterceptionContext context = interception_create_context();
     if (!context) {
-        std::cerr << "Failed to create context." << std::endl;
+        // std::cerr << "Failed to create context." << std::endl;
         return 1;
     }
 
@@ -42,7 +42,7 @@ int main() {
     }
 
     if (keyboards.empty()) {
-        std::cerr << "No keyboard devices found." << std::endl;
+        // std::cerr << "No keyboard devices found." << std::endl;
         interception_destroy_context(context);
         return 1;
     }
@@ -57,7 +57,7 @@ int main() {
 
     // Select the first USB keyboard automatically
     InterceptionDevice targetDevice = keyboards[0].first;
-    std::wcout << L"Selected USB device: " << keyboards[0].second << L" (device " << targetDevice << L")\n";
+    // std::wcout << L"Selected USB device: " << keyboards[0].second << L" (device " << targetDevice << L")\n";
 
     interception_set_filter(context, interception_is_keyboard, INTERCEPTION_FILTER_KEY_DOWN | INTERCEPTION_FILTER_KEY_UP);
 
