@@ -18,6 +18,7 @@ try:
         ["macro.exe"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
     )
     print("Macro.exe started!")
+    print("Press any key to register a keyboard as a macro device...")
 
     for line in process.stdout:
         key = line.strip().lower()
@@ -26,7 +27,7 @@ try:
         if action:
             action()
         else:
-            print(f"No action defined for: {key} key")
+            print(key)
 
 except KeyboardInterrupt:
     print("Quitting Macro.exe...")

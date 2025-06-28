@@ -23,59 +23,38 @@ std::string GetKeyName(unsigned short code) {
 }
 
 int main() {
-    // std::cout << "Creating context..." << std::endl;
     InterceptionContext context = interception_create_context();
-    if (!context) {
-        // std::cerr << "Failed to create context." << std::endl;
-        return 1;
-    }
-
-    // Detect all keyboard devices and collect hardware IDs
-    std::vector<std::pair<InterceptionDevice, std::wstring>> keyboards;
-
-    wchar_t buffer[500];
-    for (InterceptionDevice device = 1; device <= INTERCEPTION_MAX_DEVICE; ++device) {
-        if (interception_is_keyboard(device)) {
-            interception_get_hardware_id(context, device, buffer, sizeof(buffer));
-            keyboards.emplace_back(device, buffer);
-        }
-    }
-
-    if (keyboards.empty()) {
-        // std::cerr << "No keyboard devices found." << std::endl;
-        interception_destroy_context(context);
-        return 1;
-    }
-
-    // Sort USB devices (starting with "HID\\VID_") to the top
-    std::sort(keyboards.begin(), keyboards.end(),
-        [](const auto& a, const auto& b) {
-            bool a_is_usb = wcsstr(a.second.c_str(), L"HID\\VID_") != nullptr;
-            bool b_is_usb = wcsstr(b.second.c_str(), L"HID\\VID_") != nullptr;
-            return a_is_usb > b_is_usb;
-        });
-
-    // Select the first USB keyboard automatically
-    InterceptionDevice targetDevice = keyboards[0].first;
-    // std::wcout << L"Selected USB device: " << keyboards[0].second << L" (device " << targetDevice << L")\n";
+    if (!context) return 1;
 
     interception_set_filter(context, interception_is_keyboard, INTERCEPTION_FILTER_KEY_DOWN | INTERCEPTION_FILTER_KEY_UP);
 
+    InterceptionDevice macroDevice = 0;
     InterceptionStroke stroke;
+
     while (true) {
         InterceptionDevice device = interception_wait(context);
         if (interception_receive(context, device, &stroke, 1) > 0) {
             InterceptionKeyStroke* key = reinterpret_cast<InterceptionKeyStroke*>(&stroke);
 
-            if (device == targetDevice && key->state == 0) { // Fire only on key down
-            std::cout << GetKeyName(key->code) << std::endl;
-            continue;  // Block from OS
+            if (key->state == 0) { // Key down
+                if (macroDevice == 0 && interception_is_keyboard(device)) {
+                    macroDevice = device;
+                    std::cout << "Macro keyboard registered on device " << macroDevice << std::endl;
+                    continue; // Don’t send to OS
+                }
+
+                if (device == macroDevice) {
+                    std::cout << GetKeyName(key->code) << std::endl;
+                    continue; // Swallow macro key
+                }
             }
 
-            interception_send(context, device, &stroke, 1); // Let others through
+            // For non-macro input devices, let keystroke pass through
+            interception_send(context, device, &stroke, 1);
         }
     }
 
     interception_destroy_context(context);
     return 0;
 }
+
